@@ -26,11 +26,8 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-<<<<<<< HEAD
 datasets/PretrainedModels/
 
-=======
->>>>>>> caed598d65bcd2240d76c602c46d0bc358899c03
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
