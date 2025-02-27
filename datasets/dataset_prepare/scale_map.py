@@ -17,6 +17,8 @@ from config import cfg
 from misc.utils import *
 import scipy.io as sio
 from PIL import Image, ImageOps
+# NEW ADDITION!!!
+import torch
 
 # for VD
 mean_std = ([0.42968395352363586, 0.4371049106121063, 0.4219788610935211], [
@@ -27,16 +29,17 @@ img_transform = standard_transforms.Compose([
 ])
 
 pil_to_tensor = standard_transforms.ToTensor()
-model_path = './pretrained_scale_prediction_model.pth'
+# model_path = './pretrained_scale_prediction_model.pth'
+model_path = "C:/Users/rsriram3/ind_study/IIM/datasets/PretrainedModels/pretrained_scale_prediction_model.pth"
 
 
 def main(dataset = None):
     if dataset == 'QNRF':
         dataRoot = '/media/D/GJY/ht/ProcessedData/QNRF/'
     if dataset == 'SHHB':
-        dataRoot = '/media/D/GJY/ht/ProcessedData/SHHB/'
+        dataRoot = "C:/Users/rsriram3/ind_study/multi_data/ShanghaiTech Data/SHHB"
     if dataset == 'SHHA':
-        dataRoot = '/media/D/GJY/ht/ProcessedData/SHHA/'
+        dataRoot = "C:/Users/rsriram3/ind_study/multi_data/ShanghaiTech Data/SHHA"
     img_path = os.path.join(dataRoot, 'images')
     dst_size_map_path = os.path.join(dataRoot, 'size_map')
     if not os.path.exists(dst_size_map_path):
@@ -48,9 +51,10 @@ def main(dataset = None):
     GPU_ID = '0,1'
     os.environ["CUDA_VISIBLE_DEVICES"] = GPU_ID
     torch.backends.cudnn.benchmark = True
-
+    
     net = CrowdCounter(GPU_ID, 'Res50_SCAR')
-    net.cuda()
+    # net.cuda()
+    net = torch.nn.DataParallel(net).cuda()
     net.load_state_dict(torch.load(model_path), strict=False)
     net.eval()
 
@@ -75,7 +79,10 @@ def main(dataset = None):
                 b, c, h, w = img.shape
                 slice_h,slice_w = 768, 1024
                 if h * w < slice_h * 2 * slice_w * 2 and h % 16 == 0 and w % 16 == 0:
-                    pred_map = net.test_forward(img).cpu()
+                    # pred_map = net.test_forward(img).cpu()
+                    # NEW ADDITION!!!
+                    pred_map = net.module.test_forward(img).cpu()
+                    
                 else:
                     assert  h % 16 == 0 and w % 16 == 0
 
@@ -92,9 +99,12 @@ def main(dataset = None):
 
                     # forward may need repeatng
                     crop_preds = []
-                    nz, period = crop_imgs.size(0), 8
+                    nz, period = crop_imgs.size(0), 4
+                    # nz, period = crop_imgs.size(0), 8
                     for i in range(0, nz, period):
-                        crop_pred = net.test_forward(crop_imgs[i:min(nz, i + period)]).cpu()
+                        # crop_pred = net.test_forward(crop_imgs[i:min(nz, i + period)]).cpu()
+                        # NEW ADDITION!!!
+                        crop_pred = net.module.test_forward(crop_imgs[i:min(nz, i + period)]).cpu()
                         crop_preds.append(crop_pred)
 
                     crop_preds = torch.cat(crop_preds, dim=0)
@@ -132,6 +142,8 @@ def main(dataset = None):
             # pdb.set_trace()
             # print(f'{filename} {pred:.4f}', file=record)
             cv.imwrite(size_map_path, pred_map, [cv.IMWRITE_JPEG_QUALITY, 100])
+            # NEW ADDITION!!!
+            torch.cuda.empty_cache()
             # #
     # record.close()
 

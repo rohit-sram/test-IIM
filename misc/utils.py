@@ -97,17 +97,18 @@ def logger(exp_path, exp_name, work_dir, exception, resume=False):
     
     if not os.path.exists(exp_path):
         os.mkdir(exp_path)
-    writer = SummaryWriter(exp_path+ '/' + exp_name)
-    log_file = exp_path + '/' + exp_name + '/' + exp_name + '.txt'
+    log_dir = os.path.join(exp_path, exp_name)
+    writer = SummaryWriter(log_dir)
+    log_file = os.path.join(log_dir, f"{exp_name}.txt")
     
-    cfg_file = open('./config.py',"r")  
+    cfg_file = open('.\config.py',"r")  
     cfg_lines = cfg_file.readlines()
     
     with open(log_file, 'a') as f:
         f.write(''.join(cfg_lines) + '\n\n\n\n')
 
     if not resume:
-        copy_cur_env(work_dir, exp_path+ '/' + exp_name + '/code', exception)
+        copy_cur_env(work_dir, os.path.join(log_dir, 'code'), exception)
 
     return writer, log_file
 
@@ -275,20 +276,38 @@ def update_model(trainer,scores):
     return train_record
 
 
-def copy_cur_env(work_dir, dst_dir, exception):
+# def copy_cur_env(work_dir, dst_dir, exception):
 
+#     if not os.path.exists(dst_dir):
+#         os.mkdir(dst_dir)
+
+#     for filename in os.listdir(work_dir):
+
+#         file = os.path.join(work_dir,filename)
+#         dst_file = os.path.join(dst_dir,filename)
+
+#         if os.path.isdir(file) and filename not in exception:
+#             # shutil.copytree(file, dst_file)
+#             shutil.copytree(file, dst_file, dirs_exist_ok=True)
+#         elif os.path.isfile(file):
+#             # shutil.copyfile(file,dst_file)
+#             shutil.copytree(file, dst_file, dirs_exist_ok=True)
+            
+
+def copy_cur_env(work_dir, dst_dir, exception):
     if not os.path.exists(dst_dir):
-        os.mkdir(dst_dir)
+        os.makedirs(dst_dir)
 
     for filename in os.listdir(work_dir):
+        file = os.path.join(work_dir, filename)
+        dst_file = os.path.join(dst_dir, filename)
 
-        file = os.path.join(work_dir,filename)
-        dst_file = os.path.join(dst_dir,filename)
+        if filename not in exception:
+            if os.path.isdir(file):
+                shutil.copytree(file, dst_file, dirs_exist_ok=True)
+            elif os.path.isfile(file):
+                shutil.copy2(file, dst_file)
 
-        if os.path.isdir(file) and filename not in exception:
-            shutil.copytree(file, dst_file)
-        elif os.path.isfile(file):
-            shutil.copyfile(file,dst_file)
 
 
 class AverageMeter(object):

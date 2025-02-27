@@ -11,6 +11,7 @@ import datasets
 import cv2
 from tqdm import tqdm
 from misc.compute_metric import eval_metrics
+import atexit
 
 class Trainer():
     def __init__(self, cfg_data, pwd):
@@ -22,8 +23,12 @@ class Trainer():
         self.exp_name = cfg.EXP_NAME
         self.exp_path = cfg.EXP_PATH
         self.pwd = pwd
-
         self.net_name = cfg.NET
+        
+        print(torch.cuda.device_count())
+        print(torch.cuda.get_device_name(0) if torch.cuda.device_count() > 0 else "No GPU available.")
+
+        
         self.net = Crowd_locator(cfg.NET,cfg.GPU_ID,pretrained=True)
 
         if cfg.OPT == 'Adam':
@@ -36,8 +41,7 @@ class Trainer():
 
         self.epoch = 0
         self.i_tb = 0
-        self.num_iters = cfg.MAX_EPOCH * np.int(len(self.train_loader))
-
+        self.num_iters = cfg.MAX_EPOCH * int(len(self.train_loader))
 
         if cfg.RESUME:
             latest_state = torch.load(cfg.RESUME_PATH)
@@ -51,8 +55,14 @@ class Trainer():
             self.exp_path = latest_state['exp_path']
             self.exp_name = latest_state['exp_name']
             print("Finish loading resume mode")
+        
         self.writer, self.log_txt = logger(self.exp_path, self.exp_name, self.pwd, ['exp','figure','img', 'vis'], resume=cfg.RESUME)
+        atexit.register(self.cleanup)
+        
 
+    def cleanup(self):
+        if hasattr(self, 'writer'):
+            self.writer.close()
 
     def forward(self):
         # self.validate()
@@ -118,12 +128,19 @@ class Trainer():
                 print( '[ep %d][it %d][loss %.4f][lr1 %.4f][lr2 %.4f][%.2fs]' % \
                         (self.epoch + 1, i + 1, head_map_loss.item(), self.optimizer.param_groups[0]['lr']*10000, self.optimizer.param_groups[1]['lr']*10000,self.timer['iter time'].diff) )
                 print( '       [t-max: %.3f t-min: %.3f]' %
-                       (threshold_matrix.max().item(), threshold_matrix.min().item()) )
+                       (threshold_matrix.max().item(), threshold_matrix.min().item()))
+                
+            # NEW ADDITION!!!        
+            # self.writer.close()
+            
             if  i %100==0:
                 box_pre, boxes = self.get_boxInfo_from_Binar_map(binar_map[0].detach().cpu().numpy())
                 vis_results('tmp_vis', 0, self.writer, self.restore_transform, img, pre_map[0].detach().cpu().numpy(), \
                                  gt_map[0].detach().cpu().numpy(),binar_map.detach().cpu().numpy(),
                                  threshold_matrix.detach().cpu().numpy(),boxes)
+        
+        # NEW ADDITION!!!        
+        self.writer.close()
 
     def get_boxInfo_from_Binar_map(self, Binar_numpy, min_area=3):
         Binar_numpy = Binar_numpy.squeeze().astype(np.uint8)
@@ -290,6 +307,8 @@ class Trainer():
         self.writer.add_scalar('overall_mae', mae, self.epoch + 1)
         self.writer.add_scalar('overall_mse', mse, self.epoch + 1)
         self.writer.add_scalar('overall_nae', nae, self.epoch + 1)
+        
+        # self.writer.close()
 
         self.train_record = update_model(self, [f1m_l, ap_l, ar_l,mae, mse, nae, loss])
 

@@ -10,10 +10,16 @@ import scipy.io as scio
 import glob
 import torch
 import torch.nn.functional as F
+from pathlib import Path
+
 mode = 'train'
-Root = '/media/D/GJY/ht/ProcessedData/SHHA'
+# Root = '/media/D/GJY/ht/ProcessedData/SHHA'
+# Root = "C:\Users\rsriram3\ind_study\multi_data\ShanghaiTech Data\SHHA"
+Root = Path("C:/Users/rsriram3/ind_study/multi_data/ShanghaiTech Data/SHHA")
 train_path =  os.path.join(Root,'train_data')
 test_path =  os.path.join(Root,'test_data')
+
+# print(train_path, '\n', test_path)
 
 
 dst_imgs_path = os.path.join(Root,'images')
@@ -34,9 +40,11 @@ if  not os.path.exists(dst_json_path):
 
 def resize_images(src_path, shift=0, resize_factor = 2):
     file_list = glob.glob(os.path.join(src_path,'images','*.jpg'))
+    
     print(len(file_list))
     for idx, img_path in enumerate(file_list):
-        img_id = img_path.split('/')[-1].split('.')[0]
+        # img_id = img_path.split('/')[-1].split('.')[0]
+        img_id = img_path.split('\\')[-1].split('.')[0]
         img_id =  int(img_id.split('_')[1]) + shift
         img_id = str(img_id).zfill(4)
         dst_img_path = os.path.join(dst_imgs_path, img_id+'.jpg')
@@ -46,6 +54,7 @@ def resize_images(src_path, shift=0, resize_factor = 2):
             img_ori = Image.open(img_path)
             w, h = img_ori.size
             new_w, new_h = w*2, h*2
+            # new_w, new_h = w*0.5, h*0.5
             p_w, p_h = new_w / 1024, new_h / 768
             if p_w < 1 or p_h < 1:
                 if p_w > p_h:
@@ -168,17 +177,17 @@ def writer_jsons():
 
 def generate_masks():
     file_list = glob.glob(os.path.join(dst_imgs_path,'*.jpg'))
-
-    print(len(file_list))
+    print(dst_json_path)
+    print(len(file_list)) # 482
     for idx, img_path in enumerate(file_list):
         if '.jpg' in img_path :
 
-            img_id = img_path.split('/')[-1].split('.')[0]
+            img_id = img_path.split('\\')[-1].split('.')[0]
             img_ori = Image.open(img_path)
             w, h = img_ori.size
 
-            print(img_id)
             print(w, h)
+            print(img_id)
             mask_map = np.zeros((h, w), dtype='uint8')
             gt_name = os.path.join(dst_json_path, img_id.split('.')[0] + '.json')
 
@@ -423,14 +432,66 @@ def loc_gt_make(  mode = 'test'):
                 f.write('\n')
 
     print(count)
+
+# NEW ADDITION!!!
+import subprocess
+# import time
+# import re
+def get_gpu_memory_usage():
+    """
+    Retrieves GPU memory usage using nvidia-smi.
+
+    Returns:
+        dict: A dictionary containing GPU ID, total memory, used memory, and free memory
+              in MB. Returns None if nvidia-smi is not available or an error occurs.
+    """
+    try:
+        # Execute nvidia-smi command and capture output
+        command = "nvidia-smi --query-gpu=index,memory.total,memory.used,memory.free --format=csv,noheader,nounits"
+        result = subprocess.check_output(command, shell=True).decode('utf-8')
+
+        # Parse the output
+        lines = result.strip().split('\n')
+        gpu_info = {}
+        for line in lines:
+            index, total, used, free = line.split(',')
+            gpu_info['index'] = int(index)
+            gpu_info['total'] = int(total)
+            gpu_info['used'] = int(used)
+            gpu_info['free'] = int(free)
+        return gpu_info
+    except FileNotFoundError:
+        print("nvidia-smi not found. Is NVIDIA driver installed and configured?")
+        return None
+    except subprocess.CalledProcessError as e:
+        print(f"Error running nvidia-smi: {e}")
+        return None
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return None
+
+      
 if __name__ == '__main__':
     #================1. resize images ===================
     resize_images(train_path, 0)
     resize_images(test_path, 300)
 
     # ================2. size_map ==================
+    import sys
+    IIM_repo_path = "C:/Users/rsriram3/ind_study/IIM"
+    sys.path.append(IIM_repo_path)
+    
     from datasets.dataset_prepare.scale_map import main
-    main ('SHHA')
+    
+    gpu_usage_start = get_gpu_memory_usage()
+    if gpu_usage_start:
+      print(f"GPU usage before scale_map.py: {gpu_usage_start}")
+
+    main('SHHA')
+
+    gpu_usage_end = get_gpu_memory_usage()
+    if gpu_usage_end:
+      print(f"GPU usage after scale_map.py: {gpu_usage_start}")    
 
     # ================3. box_level annotations ==================
     writer_jsons()

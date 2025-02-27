@@ -48,7 +48,8 @@ class Dataset(data.Dataset):
                     line=line.strip()
                     self.img_path.append(os.path.join(data_path,  'images',line + '.jpg'))
                     # self.json_path.append(os.path.join(root, self.mode, 'jsons', splited[0] + '.json'))
-                    self.mask_path.append(os.path.join(data_path,  'mask_50_60', line + '.png'))
+                    # self.mask_path.append(os.path.join(data_path,  'mask_50_60', line + '.png'))
+                    self.mask_path.append(os.path.join(data_path,  'mask', line + '.png'))
                     if self.mode == 'val':
                         self.box_gt.append(box_gt_Info[int(line)])
 

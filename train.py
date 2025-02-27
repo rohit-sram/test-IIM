@@ -27,5 +27,7 @@ from trainer import Trainer
 
 #------------Start Training------------
 pwd = os.path.split(os.path.realpath(__file__))[0]
-cc_trainer = Trainer(cfg_data, pwd)
-cc_trainer.forward()
+
+if __name__ == "__main__":
+    cc_trainer = Trainer(cfg_data, pwd)
+    cc_trainer.forward()

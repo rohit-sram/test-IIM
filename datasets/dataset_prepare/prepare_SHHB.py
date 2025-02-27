@@ -11,8 +11,11 @@ import scipy.io as scio
 import glob
 import torch
 import torch.nn.functional as F
+from pathlib import Path
+
 mode = 'train'
-Root = '/media/D/GJY/ht/ProcessedData/SHHB'
+# Root = '/media/D/GJY/ht/ProcessedData/SHHB'
+Root = Path("C:/Users/rsriram3/ind_study/multi_data/ShanghaiTech Data/SHHB")
 train_path =  os.path.join(Root,'train_data')
 test_path =  os.path.join(Root,'test_data')
 
@@ -37,7 +40,8 @@ def resize_images(src_path, shift=0, resize_factor = 2):
     file_list = glob.glob(os.path.join(src_path,'images','*.jpg'))
     print(len(file_list))
     for idx, img_path in enumerate(file_list):
-        img_id = img_path.split('/')[-1].split('.')[0]
+        # img_id = img_path.split('/')[-1].split('.')[0]
+        img_id = img_path.split('\\')[-1].split('.')[0]
         img_id =  int(img_id.split('_')[1]) + shift
         img_id = str(img_id).zfill(4)
         dst_img_path = os.path.join(dst_imgs_path, img_id+'.jpg')
@@ -167,7 +171,8 @@ def generate_masks():
     print(len(file_list))
     for idx, img_path in enumerate(file_list):     # 108.jpg is the wrong labeled image
         if '0108.jpg' not in img_path :
-            img_id = img_path.split('/')[-1].split('.')[0]
+            # img_id = img_path.split('/')[-1].split('.')[0]
+            img_id = img_path.split('\\')[-1].split('.')[0]
             img_ori = Image.open(img_path)
             w, h = img_ori.size
 
@@ -430,6 +435,10 @@ if __name__ == '__main__':
     resize_images(test_path, 400)
 
     # ================2. size_map ==================
+    import sys
+    IIM_repo_path = "C:/Users/rsriram3/ind_study/IIM"
+    sys.path.append(IIM_repo_path)
+    
     from datasets.dataset_prepare.scale_map import main
     main ('SHHB')
 
