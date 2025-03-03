@@ -26,7 +26,11 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+datasets/.DS_Store
+model/.DS_Store
+saved_exp_results/.DS_Store
 datasets/PretrainedModels/
+my-iim/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
