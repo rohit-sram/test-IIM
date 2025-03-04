@@ -16,3 +16,6 @@
 - YOLOv5 counting task (SOLUTIONS). Click this [link](https://github.com/ultralytics/yolov5/issues/2696)
 
 - Aerial imagery car counting with YOLOv8. [TowardsDataScience](https://towardsdatascience.com/how-many-cars-are-in-this-aerial-imagery-lets-count-them-with-yolov8-from-scratch-7c24a3919d21/)
+
+- Aerial Dataset(s)
+    - Popular Datasets for aerial images found [here](https://lafi.github.io/LPN/)
