@@ -9,18 +9,21 @@ import cv2 as cv
 import torch
 import torch.nn.functional as F
 import sys
+import matplotlib.pyplot as plt
 # from ..functions import euclidean_dist, average_del_min
 
 # Define paths
-VEDAI_1024_ROOT = Path('/Users/rohitsriram/Documents/Higher Education/North Carolina State University/Curriculum/Year 2/independent study/vedai_1024')
-# VEDAI_1024_ROOT = "../../../../vedai_1024/"
-dst_imgs_path = os.path.join(VEDAI_1024_ROOT, 'processed_images')
+# VEDAI_1024_ROOT = Path('/Users/rohitsriram/Documents/Higher Education/North Carolina State University/Curriculum/Year 2/independent study/vedai_1024')
+VEDAI_1024_ROOT = '/mnt/ncsudrive/r/rsriram3/Documents/ind_study/VEDAI_dataset/VEDAI_1024'
 VEDAI_IMAGES_PATH = os.path.join(VEDAI_1024_ROOT, 'processed_images')
-VEDAI_LABELS_PATH = "/Users/rohitsriram/Documents/Higher Education/North Carolina State University/Curriculum/Year 2/independent study/vedai_1024_labels"
+# VEDAI_LABELS_PATH = "/Users/rohitsriram/Documents/Higher Education/North Carolina State University/Curriculum/Year 2/independent study/vedai_1024_labels"
+VEDAI_LABELS_PATH = os.path.join(VEDAI_1024_ROOT, 'labels')
 VEDAI_JSON_PATH = os.path.join(VEDAI_1024_ROOT, 'jsons')
-# VEDAI_SIZE_MAP_PATH = "C:/Users/rsriram3/ind_study/multi_data/VEDAI/size_map/"
+VEDAI_SIZE_MAP_PATH = os.path.join(VEDAI_1024_ROOT, 'size_map')
 VEDAI_MASK_PATH = os.path.join(VEDAI_1024_ROOT, 'mask')
 IMAGE_SIZE = 1024  # Assuming images are resized to 512x512
+
+dst_imgs_path = os.path.join(VEDAI_1024_ROOT, 'processed_images')
 
 os.makedirs(dst_imgs_path, exist_ok=True)
 
@@ -166,12 +169,74 @@ def generate_vedai_masks():
         print(f"Created mask for {img_name}")
 
 
+# def generate_vedai_masks():
+#     """Generates binary masks for the VEDAI dataset using vehicle center points and saves box visualizations."""
+    
+#     # Create box_vis directory if it doesn't exist
+#     box_vis_path = os.path.join(os.path.dirname(VEDAI_1024_ROOT), 'box_vis')
+#     if not os.path.exists(box_vis_path):
+#         os.makedirs(box_vis_path)
+
+#     for img_name in tqdm(os.listdir(VEDAI_IMAGES_PATH)):
+#         img_id = img_name.split('.')[0]
+#         mask_path = os.path.join(VEDAI_MASK_PATH, img_id + '_mask.png')
+#         box_vis_path = os.path.join(box_vis_path, img_id + '_box_vis.jpg')
+
+#         # Skip if already processed
+#         if os.path.exists(mask_path) and os.path.exists(box_vis_path):
+#             continue
+
+#         # Load corresponding JSON file
+#         json_file = os.path.join(VEDAI_JSON_PATH, img_id + ".json")
+#         if not os.path.exists(json_file):
+#             print(f"Warning: JSON file not found for {img_name}, skipping.")
+#             continue
+
+#         with open(json_file, "r") as f:
+#             ImgInfo = json.load(f)
+
+#         # Load image
+#         img_path = os.path.join(VEDAI_IMAGES_PATH, img_name)
+#         img = cv.imread(img_path)
+#         if img is None:
+#             print(f"Warning: Could not read {img_name}, skipping.")
+#             continue
+#         h, w, _ = img.shape
+
+#         # Create blank mask (black background)
+#         mask_map = np.zeros((h, w), dtype=np.uint8)
+
+#         # Prepare for visualization
+#         plt.figure(figsize=(12, 8))
+#         plt.imshow(cv.cvtColor(img, cv.COLOR_BGR2RGB))
+
+#         # Mark vehicle centers on the mask and draw boxes for visualization
+#         for (x, y), (x1, y1, x2, y2) in zip(ImgInfo["points"], ImgInfo["boxes"]):
+#             if 0 <= x < w and 0 <= y < h:
+#                 mask_map[int(y), int(x)] = 255  # White pixel for vehicle center
+                
+#                 # Draw rectangle for box visualization
+#                 rect = plt.Rectangle((x1, y1), x2 - x1, y2 - y1, fill=False, edgecolor='r', linewidth=2)
+#                 plt.gca().add_patch(rect)
+#                 plt.plot(x, y, 'go', markersize=5)  # Green dot for center
+
+#         # Save the mask as PNG
+#         cv.imwrite(mask_path, mask_map, [cv.IMWRITE_PNG_COMPRESSION, 9])
+
+#         # Save box visualization
+#         plt.axis('off')
+#         plt.tight_layout()
+#         plt.savefig(box_vis_path, bbox_inches='tight', pad_inches=0, dpi=300)
+#         plt.close()
+
+#         print(f"Created mask and box visualization for {img_name}")
+
 
 # Run the resizing function
-# resize_vedai_images(VEDAI_1024_ROOT)
+resize_vedai_images(os.path.join(VEDAI_1024_ROOT, 'images'))
 # Run the JSON creation function
-# create_vedai_json()
-# create_size_maps(VEDAI_1024_ROOT, os.path.join(VEDAI_1024_ROOT, 'size_map'))
+create_vedai_json()
+create_size_maps(VEDAI_1024_ROOT, os.path.join(VEDAI_1024_ROOT, 'size_map'))
 generate_vedai_masks()
 
 # sys.path.append(str(Path(__file__).parent.parent))
