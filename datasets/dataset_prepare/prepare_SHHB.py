@@ -440,19 +440,21 @@ if __name__ == '__main__':
     sys.path.append(IIM_repo_path)
     
     from datasets.dataset_prepare.scale_map import main
-    main ('SHHB')
+    # main ('SHHB')
 
-    # ================3. box_level annotations ==================
-    writer_jsons()
+    # # ================3. box_level annotations ==================
+    # writer_jsons()
 
-    # ================4. masks ==================
-    generate_masks()
+    # # ================4. masks ==================
+    # generate_masks()
 
-    # ================5. train test val id==================
-    divide_dataset()
+    # # ================5. train test val id==================
+    # divide_dataset()
 
-    # ==============6. generate val_loc_gt.txt and test_loc_gt.txt==================
-    loc_gt_make(mode = 'test')
-    loc_gt_make(mode='val')
+    # # ==============6. generate val_loc_gt.txt and test_loc_gt.txt==================
+    # loc_gt_make(mode = 'test')
+    # loc_gt_make(mode='val')
+    loc_gt_make(mode='train')
+
 
     print("task is finished")

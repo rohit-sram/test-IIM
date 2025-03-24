@@ -34,7 +34,7 @@ __C.LR_DECAY_START = 10 # no use
 
 
 __C.MAX_EPOCH = 20
-__C.PRINT_FREQ = 20
+__C.PRINT_FREQ = 5
 
 now = time.strftime("%m-%d_%H-%M", time.localtime())
 
