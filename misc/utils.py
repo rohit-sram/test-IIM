@@ -96,7 +96,8 @@ def logger(exp_path, exp_name, work_dir, exception, resume=False):
 
     from tensorboardX import SummaryWriter
     
-    config_path = Path("../config.py")
+    # config_path = Path("../config.py"
+    config_path = Path('/mnt/ncsudrive/r/rsriram3/Documents/ind_study/test-IIM/config.py')
     if not os.path.exists(exp_path):
         os.mkdir(exp_path)
     log_dir = os.path.join(exp_path, exp_name)
