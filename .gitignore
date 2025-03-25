@@ -32,6 +32,7 @@ saved_exp_results/.DS_Store
 datasets/PretrainedModels/
 my-iim/
 temp_file.py
+exp/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

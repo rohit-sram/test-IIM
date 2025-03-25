@@ -7,6 +7,7 @@ import random
 import shutil
 import cv2
 from PIL import Image
+from pathlib import Path
 
 import pdb
 import torch
@@ -95,14 +96,21 @@ def logger(exp_path, exp_name, work_dir, exception, resume=False):
 
     from tensorboardX import SummaryWriter
     
+    config_path = Path("../config.py")
     if not os.path.exists(exp_path):
         os.mkdir(exp_path)
     log_dir = os.path.join(exp_path, exp_name)
     writer = SummaryWriter(log_dir)
     log_file = os.path.join(log_dir, f"{exp_name}.txt")
     
-    cfg_file = open('.\config.py',"r")  
-    cfg_lines = cfg_file.readlines()
+    if config_path.exists():
+        with open (config_path, 'r') as cfg_file:
+            cfg_lines = cfg_file.readlines()
+        
+    else:
+        print(f"Error: The file {config_path} does not exist.")
+        raise FileNotFoundError(f"The file {config_path} does not exist.")
+    # cfg_file = open('../config.py',"r")  
     
     with open(log_file, 'a') as f:
         f.write(''.join(cfg_lines) + '\n\n\n\n')
