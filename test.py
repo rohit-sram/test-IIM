@@ -6,16 +6,19 @@ import torchvision.transforms as standard_transforms
 import misc.transforms as own_transforms
 import tqdm
 from model.locator import Crowd_locator
-from misc.utils import *
+# from misc.utils import *
 from PIL import Image, ImageOps
 import  cv2 
 from collections import OrderedDict
 
-dataset = 'JHU'
-dataRoot = '../ProcessedData/' + dataset
+# dataset = 'JHU'
+dataset = 'SHHB'
+# dataRoot = '../ProcessedData/' + dataset
+dataRoot = 'C:\Users\rsriram3\Documents\ind_study\ShanghaiTech Data' + dataset
 test_list = 'test.txt'
 
-GPU_ID = '2,3'
+# GPU_ID = '2,3'
+GPU_ID = '0, 1'
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_ID
 torch.backends.cudnn.benchmark = True
 
@@ -56,7 +59,7 @@ def main():
 
 
 def get_boxInfo_from_Binar_map(Binar_numpy, min_area=3):
-    Binar_numpy = Binar_numpy.squeeze().astype(np.uint8)
+    Binar_numpy = Binar_numpy.squeeze().astype(int)
     assert Binar_numpy.ndim == 2
     cnt, labels, stats, centroids = cv2.connectedComponentsWithStats(Binar_numpy, connectivity=4)  # centriod (w,h)
 

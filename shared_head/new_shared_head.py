@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
-from model.HR_Net.seg_hrnet import HighResolutionNet
+from model.HR_Net.seg_hrnet import HighResolutionNet 
+# from sryolo_model.SRyolo import Model ## import SR yolo files later
 
 ## remove later
 hrnet_config = "..\model\HR_Net\seg_hrnet_w48.yaml"
@@ -8,7 +9,10 @@ hrnet_config = "..\model\HR_Net\seg_hrnet_w48.yaml"
 class SharedHead(nn.Module):
     def __init__(self):
         super().__init__()
-        self.backbone = HighResolutionNet(config=hrnet_config)
+        if True:
+            self.hrnet_backbone = HighResolutionNet(config=hrnet_config)
+        else:
+            self.yolo_backbone = Model()
 
     def forward(self, x):
         return self.backbone(x)

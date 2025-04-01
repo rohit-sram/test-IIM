@@ -53,7 +53,6 @@ class TaskRouter(nn.Module):
 
     def route_image(self, img):
         # Convert image to PyTorch tensor
-        import torch
         img_tensor = torch.tensor(img).permute(2, 0, 1).unsqueeze(0).float()
         
         # Route image

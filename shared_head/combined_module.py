@@ -33,7 +33,7 @@ class CombinedModule(nn.Module):
         self.crowd_head = CrowdHead()
 
     def forward(self, x):
-        preprocessed_image = preprocess_image(image_path)
+        preprocessed_image = preprocess_image(x) ## might have to remove this
         # features = self.backbone(x)
         features = self.backbone(preprocessed_image)
         task_type = self.router.route_image(preprocessed_image)  # 0 for vehicle, 1 for crowd

@@ -33,6 +33,7 @@ datasets/PretrainedModels/
 my-iim/
 temp_file.py
 exp/
+pretrained_exp/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
