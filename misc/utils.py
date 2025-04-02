@@ -29,16 +29,20 @@ def read_pred_and_gt(pred_file,gt_file):
                 flagError = True
                 sys.exit(1)
 
-            line_data = [int(i) for i in line]
-            idx, num = [line_data[0], line_data[1]]
-            id_read.append(idx)
+            try:
+                line_data = [int(i) for i in line]
+                idx, num = [line_data[0], line_data[1]]
+                id_read.append(idx)
 
-            points = []
-            if num>0:
-                points = np.array(line_data[2:]).reshape(((len(line)-2)//2,2))
-                pred_data[idx] = {'num': num, 'points':points}
-            else:
-                pred_data[idx] = {'num': num, 'points':[]}
+                points = []
+                if num>0:
+                    points = np.array(line_data[2:]).reshape(((len(line)-2)//2,2))
+                    pred_data[idx] = {'num': num, 'points':points}
+                else:
+                    pred_data[idx] = {'num': num, 'points':[]}
+            except:
+                print(f"Invalid data in pred file: {line}")
+                continue
 
     # read gt
     gt_data = {}

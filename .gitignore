@@ -34,6 +34,8 @@ my-iim/
 temp_file.py
 exp/
 pretrained_exp/
+saved_exp_results/XXX_vis_results/
+saved_exp_results/val_results/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

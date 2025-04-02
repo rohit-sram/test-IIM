@@ -5,6 +5,8 @@ from torch.autograd import Variable
 import torchvision.transforms as standard_transforms
 import misc.transforms as own_transforms
 import tqdm
+import numpy as np
+from pathlib import Path
 from model.locator import Crowd_locator
 # from misc.utils import *
 from PIL import Image, ImageOps
@@ -14,18 +16,24 @@ from collections import OrderedDict
 # dataset = 'JHU'
 dataset = 'SHHB'
 # dataRoot = '../ProcessedData/' + dataset
-dataRoot = 'C:\Users\rsriram3\Documents\ind_study\ShanghaiTech Data' + dataset
-test_list = 'test.txt'
+dataRoot = Path(r'C:\Users\rsriram3\Documents\ind_study\ShanghaiTech Data') / dataset
+# test_list = 'test.txt'
+test_list = 'val.txt'
 
 # GPU_ID = '2,3'
 GPU_ID = '0, 1'
 os.environ["CUDA_VISIBLE_DEVICES"] = GPU_ID
 torch.backends.cudnn.benchmark = True
 
-netName = 'HR_Net' # options: HR_Net,VGG16_FPN
-model_path = './exp/01-03_13-54_JHU_HR_Net/ep_305_F1_0.676_Pre_0.764_Rec_0.607_mae_74.5_mse_332.6.pth'
+# netName = 'HR_Net' # options: HR_Net,VGG16_FPN
+netName = 'VGG16_FPN'
+# model_path = './exp/01-03_13-54_JHU_HR_Net/ep_305_F1_0.676_Pre_0.764_Rec_0.607_mae_74.5_mse_332.6.pth'
+model_path = Path('./pretrained_exp/SHHB-VGG-ep_493_F1_0.830_Pre_0.882_Rec_0.783_mae_16.4_mse_36.4.pth')
 
-out_file_name= './saved_exp_results/' + dataset + '_' + netName + '_' + test_list
+# out_file_name= './saved_exp_results/' + dataset + '_' + netName + '_' + test_list
+output_path = Path('./saved_exp_results/val_results')
+output_path.mkdir(parents=True, exist_ok=True)
+out_file_name= output_path / f"{dataset}_{netName}_{test_list}"
 
 
 if dataset == 'NWPU':
@@ -60,7 +68,7 @@ def main():
 
 
 def get_boxInfo_from_Binar_map(Binar_numpy, min_area=3):
-    Binar_numpy = Binar_numpy.squeeze().astype(int)
+    Binar_numpy = Binar_numpy.squeeze().astype(np.uint8)
     assert Binar_numpy.ndim == 2
     cnt, labels, stats, centroids = cv2.connectedComponentsWithStats(Binar_numpy, connectivity=4)  # centriod (w,h)
 
