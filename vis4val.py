@@ -7,7 +7,8 @@ import cv2
 from misc.utils import hungarian,read_pred_and_gt,AverageMeter,AverageCategoryMeter
 
 # dataset = 'NWPU'
-dataset = 'SHHA'
+# dataset = 'SHHA'
+dataset = 'SHHB'
 # dataRoot = '../ProcessedData/' + dataset
 # temp = "C:/Users/rsriram3/ind_study/IIM/vis4val.py"
 # "C:\Users\rsriram3\ind_study\ShanghaiTech Data"
