@@ -53,6 +53,7 @@ restore = standard_transforms.Compose([
 def main():
 
     txtpath = os.path.join(dataRoot, test_list)
+    assert os.path.exists(txtpath), f"Error: {txtpath} does not exist."
     with open(txtpath) as f:
         lines = f.readlines()                            
     test(lines, model_path)
@@ -76,7 +77,7 @@ def test(file_list, model_path):
 
     net = Crowd_locator(netName,GPU_ID,pretrained=True)
     net.cuda()
-    state_dict = torch.load(model_path)
+    state_dict = torch.load(model_path, map_location='cuda:0')
     if len(GPU_ID.split(','))>1:
         net.load_state_dict(state_dict)
     else:

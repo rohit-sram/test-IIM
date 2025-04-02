@@ -49,7 +49,7 @@ class Crowd_locator(nn.Module):
 
         threshold_matrix, binar_map = self.Binar(feature,pre_map)
 
-        if mode == 'train':
+        if mode == 'train' and mask_gt is not None:
         # weight = torch.ones_like(binar_map).cuda()
         # weight[mask_gt==1] = 2
             assert pre_map.size(2) == mask_gt.size(2)
@@ -80,8 +80,28 @@ if __name__ == '__main__':
     # target = torch.ones(2,100)
     # loss = F.binary_cross_entropy(input,target)
     # print(loss)
-    model = Res_FPN(pretrained = False).cuda()
-    summary(model,(3,24,24))
+    
+    # model = Res_FPN(pretrained = False).cuda()
+    # summary(model,(3,24,24))
+
+    # Create model instance (modify parameters as needed)
+    net = Crowd_locator(netName='VGG16_FPN', gpu_id='0')
+
+    # Wrapper to handle forward arguments
+    class SummaryWrapper(torch.nn.Module):
+        def __init__(self, model):
+            super().__init__()
+            self.model = model
+            
+        def forward(self, x):
+            return self.model(x, mask_gt=None, mode='val')  # Use validation mode
+
+    # Call model and get summary (input size = (channels, height, width))
+    wrapped_model = SummaryWrapper(net).cuda()
+    summary(wrapped_model, 
+            input_size=(3, 512, 512),  # Example input size
+            device='cuda')
+
 
     # import torch
     # import torch.nn as nn
