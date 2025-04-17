@@ -17,3 +17,9 @@ yacs
 # new installments
 matplotlib
 tqdm
+timm
+ipykernel
+scikit-image
+scikit-learn
+cv2
+pillow
