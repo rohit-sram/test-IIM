@@ -27,7 +27,8 @@ def generate_label_csv(csv_path, root_dir):
     root_dir = Path(root_dir)
 
     for _, row in tqdm(df.iterrows(), total=len(df), desc="Computing image features"):
-        img_path = root_dir / row['image']
+        rel_path = Path(row['image'])
+        img_path = root_dir / rel_path
         brightness, edge_density, entropy = compute_image_features(img_path)
         features.append([brightness, edge_density, entropy])
 
