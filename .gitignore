@@ -32,6 +32,7 @@ saved_exp_results/.DS_Store
 datasets/PretrainedModels/
 my-iim/
 temp_file.py
+temp_py_file.py
 exp/
 pretrained_exp/
 saved_exp_results/XXX_vis_results/
